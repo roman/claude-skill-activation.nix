@@ -1,0 +1,42 @@
+{ lib
+, buildNpmPackage
+, nodejs
+}:
+
+buildNpmPackage {
+  pname = "skill-activation";
+  version = "0.0.1";
+
+  src = ../../../skill/scripts;
+
+  npmDepsHash = "sha256-urAeUG7ApdqDB6MIEbke0McVlzN5uV86+v+mKBn0l3U=";
+
+  # Compile TypeScript to JavaScript
+  buildPhase = ''
+    runHook preBuild
+    npm run build
+    runHook postBuild
+  '';
+
+  # Install the compiled output and create executable wrapper
+  installPhase = ''
+    runHook preInstall
+
+    mkdir -p $out/bin
+    cp -r dist $out/dist
+
+    # Create executable wrapper that runs the compiled JS with Node
+    cat > $out/bin/skill-activation <<EOF
+#!${nodejs}/bin/node
+require('$out/dist/skill-activation.js');
+EOF
+    chmod +x $out/bin/skill-activation
+
+    runHook postInstall
+  '';
+
+  meta = with lib; {
+    description = "TypeScript hooks for Claude Code skill auto-activation";
+    mainProgram = "skill-activation";
+  };
+}
