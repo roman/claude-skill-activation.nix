@@ -4,7 +4,7 @@
     "description": "TypeScript hooks for Claude Code skill auto-activation",
     "private": true,
     "bin": {
-        "skill-activation": "./dist/skill-activation.js"
+        "claude-skill-activation": "./dist/skill-activation.js"
     },
     "scripts": {
         "check": "tsc --noEmit",

@@ -305,7 +305,7 @@ Content pattern matching reads entire file - slow for large files.
 
 ```bash
 # UserPromptSubmit
-time echo '{"prompt":"test"}' | skill-activation 
+time echo '{"prompt":"test"}' | claude-skill-activation
 ```
 
 **Target metrics:**

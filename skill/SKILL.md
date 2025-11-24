@@ -30,7 +30,7 @@ Automatically activates when you mention:
 ### Architecture
 
 **1. UserPromptSubmit Hook** (Proactive Suggestions)
-- **Program**: `skill-activation`
+- **Program**: `claude-skill-activation`
 - **Trigger**: BEFORE Claude sees user's prompt
 - **Purpose**: Suggest relevant skills based on keywords + intent patterns
 - **Method**: Injects formatted reminder as context (stdout → Claude's input)
@@ -346,7 +346,7 @@ See [TRIGGER_TYPES.md](TRIGGER_TYPES.md) for complete details.
 Test hooks manually:
 ```bash
 # UserPromptSubmit
-echo '{"prompt":"test"}' | skill-activation
+echo '{"prompt":"test"}' | claude-skill-activation
 ```
 
 See [TROUBLESHOOTING.md](TROUBLESHOOTING.md) for complete debugging guide.

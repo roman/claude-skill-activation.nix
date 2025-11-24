@@ -16,9 +16,9 @@ in
 
     package = lib.mkOption {
       type = lib.types.package;
-      default = flakeInputs.self.packages.${pkgs.system}.skill-activation;
-      defaultText = lib.literalExpression "pkgs.skill-activation";
-      description = "The skill-activation package to use.";
+      default = flakeInputs.self.packages.${pkgs.system}.claude-skill-activation;
+      defaultText = lib.literalExpression "pkgs.claude-skill-activation";
+      description = "The claude-skill-activation package to use.";
     };
 
     skillRulesPath = lib.mkOption {
@@ -43,9 +43,9 @@ in
           type = "command";
           command =
             if cfg.skillRulesPath != null then
-              "${cfg.package}/bin/skill-activation ${cfg.skillRulesPath}"
+              "${cfg.package}/bin/claude-skill-activation ${cfg.skillRulesPath}"
             else
-              "${cfg.package}/bin/skill-activation";
+              "${cfg.package}/bin/claude-skill-activation";
         }
       ];
     };

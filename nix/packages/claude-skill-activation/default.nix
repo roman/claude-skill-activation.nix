@@ -5,7 +5,7 @@
 }:
 
 buildNpmPackage {
-  pname = "skill-activation";
+  pname = "claude-skill-activation";
   version = "0.0.1";
 
   src = ../../../skill/scripts;
@@ -27,18 +27,18 @@ buildNpmPackage {
         cp -r dist $out/dist
 
         # Create executable wrapper that runs the compiled JS with Node
-        cat > $out/bin/skill-activation <<EOF
+        cat > $out/bin/claude-skill-activation <<EOF
     #!${nodejs}/bin/node
     require('$out/dist/skill-activation.js');
     EOF
-        chmod +x $out/bin/skill-activation
+        chmod +x $out/bin/claude-skill-activation
 
         runHook postInstall
   '';
 
   meta = with lib; {
     description = "hooks for Claude Code skill auto-activation";
-    mainProgram = "skill-activation";
+    mainProgram = "claude-skill-activation";
     license = licenses.mit;
     maintainers = [ maintainers.roman ];
   };

@@ -1,4 +1,4 @@
-# skill-activation
+# claude-skill-activation.nix
 
 Auto-activate Claude Code skills based on context using hook-driven pattern matching.
 
@@ -8,7 +8,7 @@ Add to your flake inputs:
 
 ```nix
 {
-  inputs.skill-activation.url = "github:roman/skill-activation";
+  inputs.claude-skill-activation.url = "github:roman/claude-skill-activation.nix";
 }
 ```
 
@@ -64,7 +64,7 @@ The skill-activation package to use.
 
 **Type**: `package`
 
-**Default**: `pkgs.skill-activation`
+**Default**: `pkgs.claude-skill-activation`
 
 ### `programs.claude-code.plugins.skill-activation.skillRulesPath`
 
