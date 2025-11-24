@@ -30,13 +30,13 @@ in
 
   config = lib.mkIf (claudeCfg.enable && cfg.enable) {
 
-    # Install the skill-activation skill.
+    # Install the skill-activation skill from the package output
     home.file.".claude/skills/skill-activation" = {
-      source = "${flakeInputs.self}/skill";
+      source = "${cfg.package}/share/claude/skills/skill-activation";
       recursive = true;
     };
 
-    # Install the skill-activation hook.
+    # Install the skill-activation hook
     programs.claude-code.settings.hooks = {
       UserPromptSubmit = [
         {
