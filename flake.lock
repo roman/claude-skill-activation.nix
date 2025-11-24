@@ -353,6 +353,21 @@
         "type": "github"
       }
     },
+    "mk-shell-bin": {
+      "locked": {
+        "lastModified": 1677004959,
+        "narHash": "sha256-/uEkr1UkJrh11vD02aqufCxtbF5YnhRTIKlx5kyvf+I=",
+        "owner": "rrbutani",
+        "repo": "nix-mk-shell-bin",
+        "rev": "ff5d8bd4d68a347be5042e2f16caee391cd75887",
+        "type": "github"
+      },
+      "original": {
+        "owner": "rrbutani",
+        "repo": "nix-mk-shell-bin",
+        "type": "github"
+      }
+    },
     "nix": {
       "inputs": {
         "flake-compat": [
@@ -439,16 +454,18 @@
       "inputs": {
         "devenv": "devenv_2",
         "flake-parts": "flake-parts_4",
+        "mk-shell-bin": "mk-shell-bin",
         "nix2container": "nix2container_2",
         "nixpkgs": "nixpkgs_5",
+        "nixtest": "nixtest",
         "systems": "systems_2"
       },
       "locked": {
-        "lastModified": 1761593970,
-        "narHash": "sha256-jb3/uO8jrva5uZ8QQiv5wZ+PJGqAZTix0KD+zYnpK7M=",
+        "lastModified": 1763954362,
+        "narHash": "sha256-uSk8GyYn/mHyfnM/RV81vRVMDzIBz9QAFpfOvquwots=",
         "owner": "roman",
         "repo": "nixDir",
-        "rev": "3d6dcccde4a8f0bb929e9ced8eb156fa0d9af1b1",
+        "rev": "d175d00ac5523f06e5c8553bfaeb601eeb21805a",
         "type": "github"
       },
       "original": {
@@ -619,6 +636,23 @@
         "ref": "release-25.05",
         "repo": "nixpkgs",
         "type": "github"
+      }
+    },
+    "nixtest": {
+      "locked": {
+        "dir": "lib",
+        "lastModified": 1759340550,
+        "narHash": "sha256-EH9heYb/nHHzCpUGQGqVQnuyVGQ7D6MVMgJmzNvvmJ8=",
+        "owner": "technofab",
+        "repo": "nixtest",
+        "rev": "5a7053afcbb211b9cf8fe87f7892bb9f6b76b678",
+        "type": "gitlab"
+      },
+      "original": {
+        "dir": "lib",
+        "owner": "technofab",
+        "repo": "nixtest",
+        "type": "gitlab"
       }
     },
     "root": {
