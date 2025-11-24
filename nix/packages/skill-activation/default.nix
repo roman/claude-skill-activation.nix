@@ -1,6 +1,7 @@
-{ lib
-, buildNpmPackage
-, nodejs
+{
+  lib,
+  buildNpmPackage,
+  nodejs,
 }:
 
 buildNpmPackage {
@@ -20,23 +21,25 @@ buildNpmPackage {
 
   # Install the compiled output and create executable wrapper
   installPhase = ''
-    runHook preInstall
+        runHook preInstall
 
-    mkdir -p $out/bin
-    cp -r dist $out/dist
+        mkdir -p $out/bin
+        cp -r dist $out/dist
 
-    # Create executable wrapper that runs the compiled JS with Node
-    cat > $out/bin/skill-activation <<EOF
-#!${nodejs}/bin/node
-require('$out/dist/skill-activation.js');
-EOF
-    chmod +x $out/bin/skill-activation
+        # Create executable wrapper that runs the compiled JS with Node
+        cat > $out/bin/skill-activation <<EOF
+    #!${nodejs}/bin/node
+    require('$out/dist/skill-activation.js');
+    EOF
+        chmod +x $out/bin/skill-activation
 
-    runHook postInstall
+        runHook postInstall
   '';
 
   meta = with lib; {
-    description = "TypeScript hooks for Claude Code skill auto-activation";
+    description = "hooks for Claude Code skill auto-activation";
     mainProgram = "skill-activation";
+    license = licenses.mit;
+    maintainers = [ maintainers.roman ];
   };
 }
