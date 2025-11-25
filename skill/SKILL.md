@@ -183,17 +183,12 @@ If skill-rules.json already exists with other skills, add your new skill inside 
 
 ### Step 3: Test Triggers
 
-**Test UserPromptSubmit:**
 ```bash
-echo '{"session_id":"test","prompt":"your test prompt"}' | \
-  npx tsx .claude/hooks/skill-activation-prompt.ts
-```
+# Auto-detects configuration and tests skill activation
+test-skill-activation "your test prompt"
 
-**Test PreToolUse:**
-```bash
-cat <<'EOF' | npx tsx .claude/hooks/skill-verification-guard.ts
-{"session_id":"test","tool_name":"Edit","tool_input":{"file_path":"test.ts"}}
-EOF
+# With custom session ID
+test-skill-activation -s custom-session "your test prompt"
 ```
 
 ### Step 4: Refine Patterns
@@ -238,9 +233,7 @@ Use the JSON templates from [Quick Start Step 2](#step-2-add-to-skill-rulesjson)
 ### Step 4: Test the triggers
 
 ```bash
-# Extract and test
-HOOK_CMD=$(jq -r '.hooks.UserPromptSubmit[0].command' .claude/settings.json)
-echo '{"session_id":"test","prompt":"your test prompt"}' | $HOOK_CMD
+test-skill-activation "your test prompt"
 ```
 
 ---
@@ -413,10 +406,8 @@ See [TRIGGER_TYPES.md](TRIGGER_TYPES.md) for complete details.
 
 ### Troubleshoot
 
-Test hooks manually:
 ```bash
-# UserPromptSubmit
-echo '{"prompt":"test"}' | claude-skill-activation
+test-skill-activation "your test prompt"
 ```
 
 See [TROUBLESHOOTING.md](TROUBLESHOOTING.md) for complete debugging guide.
