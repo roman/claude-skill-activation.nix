@@ -15,7 +15,15 @@ Complete schema and configuration reference for `.claude/skills/skill-rules.json
 
 ## File Location
 
-**Path:** `.claude/skills/skill-rules.json`
+**Path:** Determined by UserPromptSubmit hook command in `.claude/settings.json`
+
+**How to find your path:**
+1. Read `.claude/settings.json` → `hooks.UserPromptSubmit[].command`
+2. Look for the file path argument to `claude-skill-activation`
+3. Example: `/nix/store/.../claude-skill-activation ~/.claude/skill-rules.json`
+   → Your path is `~/.claude/skill-rules.json`
+
+**Default fallback:** `$CLAUDE_PROJECT_DIR/.claude/skills/skill-rules.json`
 
 This JSON file defines all skills and their trigger conditions for the auto-activation system.
 

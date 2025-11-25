@@ -38,7 +38,15 @@ Automatically activates when you mention:
 
 ### Configuration File
 
-**Location**: `.claude/skills/skill-rules.json`
+**Location**: The skill-rules.json path is determined by:
+1. **Check UserPromptSubmit hook** in `.claude/settings.json` for file path parameter
+2. **Default fallback**: `$CLAUDE_PROJECT_DIR/.claude/skills/skill-rules.json`
+
+**How to find your path:**
+- Read `.claude/settings.json` → `hooks.UserPromptSubmit[].command`
+- Look for the file path argument to `claude-skill-activation`
+- Example: `/path/to/claude-skill-activation ~/.claude/skill-rules.json`
+  → Your path is `~/.claude/skill-rules.json`
 
 Defines:
 - All skills and their trigger conditions
@@ -133,16 +141,41 @@ The actual guidance, documentation, patterns, examples
 
 See [SKILL_RULES_REFERENCE.md](SKILL_RULES_REFERENCE.md) for complete schema.
 
-**Basic Template:**
+⚠️ **CRITICAL**: The skill-rules.json file MUST have top-level `version` and `skills` fields!
+
+**Complete File Template (for NEW file):**
 ```json
 {
-  "my-new-skill": {
-    "type": "domain",
-    "enforcement": "suggest",
-    "priority": "medium",
-    "promptTriggers": {
-      "keywords": ["keyword1", "keyword2"],
-      "intentPatterns": ["(create|add).*?something"]
+  "version": "1.0",
+  "skills": {
+    "my-new-skill": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "medium",
+      "promptTriggers": {
+        "keywords": ["keyword1", "keyword2"],
+        "intentPatterns": ["(create|add).*?something"]
+      }
+    }
+  }
+}
+```
+
+**Adding to Existing File:**
+If skill-rules.json already exists with other skills, add your new skill inside the `skills` object:
+```json
+{
+  "version": "1.0",
+  "skills": {
+    "existing-skill": { ... },
+    "my-new-skill": {       ← Add here
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "medium",
+      "promptTriggers": {
+        "keywords": ["keyword1", "keyword2"],
+        "intentPatterns": ["(create|add).*?something"]
+      }
     }
   }
 }
@@ -179,6 +212,36 @@ Based on testing:
 - ✅ Write detailed description with trigger keywords
 - ✅ Test with 3+ real scenarios before documenting
 - ✅ Iterate based on actual usage
+
+---
+
+## Adding Existing Skill to skill-rules.json
+
+If you already have a skill file (SKILL.md) and want to add triggers for it:
+
+### Step 1: Find your skill-rules.json path
+
+See [Configuration File](#configuration-file) section above for path discovery instructions.
+
+### Step 2: Read existing skill-rules.json (if any)
+
+```bash
+cat ~/.claude/skill-rules.json  # Use your actual path from Step 1
+```
+
+### Step 3: Add skill entry
+
+Use the JSON templates from [Quick Start Step 2](#step-2-add-to-skill-rulesjson) above:
+- For NEW/EMPTY file → Use "Complete File Template"
+- For EXISTING file → Use "Adding to Existing File" template
+
+### Step 4: Test the triggers
+
+```bash
+# Extract and test
+HOOK_CMD=$(jq -r '.hooks.UserPromptSubmit[0].command' .claude/settings.json)
+echo '{"session_id":"test","prompt":"your test prompt"}' | $HOOK_CMD
+```
 
 ---
 
@@ -311,10 +374,17 @@ Future enhancements and ideas:
 ### Create New Skill (5 Steps)
 
 1. Create `.claude/skills/{name}/SKILL.md` with frontmatter
-2. Add entry to `.claude/skills/skill-rules.json`
-3. Test with `npx tsx` commands
+2. Add entry to skill-rules.json (⚠️ MUST have `version` + `skills` wrapper!)
+3. Test with hook command
 4. Refine patterns based on testing
 5. Keep SKILL.md under 500 lines
+
+### Add Existing Skill to skill-rules.json (4 Steps)
+
+1. Find your skill-rules.json path from `.claude/settings.json` hook command
+2. Read existing file (if any) to see current structure
+3. Add skill entry to `skills` object (⚠️ MUST have `version` + `skills` wrapper!)
+4. Test with hook command: `echo '{"session_id":"test","prompt":"..."}' | $HOOK_CMD`
 
 ### Trigger Types
 
@@ -356,13 +426,12 @@ See [TROUBLESHOOTING.md](TROUBLESHOOTING.md) for complete debugging guide.
 ## Related Files
 
 **Configuration:**
-- `.claude/skills/skill-rules.json` - Master configuration
+- `skill-rules.json` - Master configuration (path determined by hook command in settings.json)
 - `.claude/hooks/state/` - Session tracking
-- `.claude/settings.json` - Hook registration
+- `.claude/settings.json` - Hook registration (check here for skill-rules.json path)
 
 **Hooks:**
-- `.claude/hooks/skill-activation-prompt.ts` - UserPromptSubmit
-- `.claude/hooks/error-handling-reminder.ts` - Stop event (gentle reminders)
+- Hook command in settings.json (e.g., `claude-skill-activation <path>`) - UserPromptSubmit
 
 **All Skills:**
 - `.claude/skills/*/SKILL.md` - Skill content files
