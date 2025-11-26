@@ -90,6 +90,11 @@ stdenv.mkDerivation {
     # Copy the compiled test script (with all dependencies wrapped by Nix)
     cp ${testScript}/bin/test-skill-activation $out/share/claude/skills/skill-activation/scripts/test-skill-activation
 
+    # Also create bin/ directory for direct binary access (used by home-manager hooks)
+    mkdir -p $out/bin
+    ln -s $out/share/claude/skills/skill-activation/scripts/claude-skill-activation $out/bin/claude-skill-activation
+    ln -s $out/share/claude/skills/skill-activation/scripts/test-skill-activation $out/bin/test-skill-activation
+
     runHook postInstall
   '';
 
