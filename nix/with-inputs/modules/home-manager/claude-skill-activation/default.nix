@@ -40,12 +40,17 @@ in
     programs.claude-code.settings.hooks = {
       UserPromptSubmit = [
         {
-          type = "command";
-          command =
-            if cfg.skillRulesPath != null then
-              "${cfg.package}/bin/claude-skill-activation ${cfg.skillRulesPath}"
-            else
-              "${cfg.package}/bin/claude-skill-activation";
+          matcher = "";
+          hooks = [
+            {
+              type = "command";
+              command =
+                if cfg.skillRulesPath != null then
+                  "${cfg.package}/bin/claude-skill-activation ${cfg.skillRulesPath}"
+                else
+                  "${cfg.package}/bin/claude-skill-activation";
+            }
+          ];
         }
       ];
     };
