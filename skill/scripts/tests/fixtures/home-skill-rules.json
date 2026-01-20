@@ -1,0 +1,22 @@
+{
+  "version": "1.0",
+  "skills": {
+    "home-only-skill": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "medium",
+      "promptTriggers": {
+        "keywords": ["home-keyword"],
+        "intentPatterns": ["home.*pattern"]
+      }
+    },
+    "shared-skill": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "low",
+      "promptTriggers": {
+        "keywords": ["shared-keyword"]
+      }
+    }
+  }
+}

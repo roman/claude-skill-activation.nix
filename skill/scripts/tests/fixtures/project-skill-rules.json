@@ -1,0 +1,22 @@
+{
+  "version": "1.0",
+  "skills": {
+    "project-only-skill": {
+      "type": "guardrail",
+      "enforcement": "block",
+      "priority": "high",
+      "promptTriggers": {
+        "keywords": ["project-keyword"],
+        "intentPatterns": ["project.*pattern"]
+      }
+    },
+    "shared-skill": {
+      "type": "guardrail",
+      "enforcement": "block",
+      "priority": "critical",
+      "promptTriggers": {
+        "keywords": ["shared-keyword"]
+      }
+    }
+  }
+}

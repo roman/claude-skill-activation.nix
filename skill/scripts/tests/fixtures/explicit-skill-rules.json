@@ -1,0 +1,21 @@
+{
+  "version": "2.0",
+  "skills": {
+    "explicit-only-skill": {
+      "type": "domain",
+      "enforcement": "warn",
+      "priority": "medium",
+      "promptTriggers": {
+        "keywords": ["explicit-keyword"]
+      }
+    },
+    "shared-skill": {
+      "type": "domain",
+      "enforcement": "warn",
+      "priority": "high",
+      "promptTriggers": {
+        "keywords": ["shared-keyword"]
+      }
+    }
+  }
+}

@@ -7,6 +7,7 @@
   jq,
   gawk,
   coreutils,
+  bash,
 }:
 
 let
@@ -68,7 +69,24 @@ stdenv.mkDerivation {
 
   src = ../../../skill;
 
+  nativeBuildInputs = [ bash coreutils ];
+
   dontBuild = true;
+
+  # Run hierarchical loading tests
+  doCheck = true;
+  checkPhase = ''
+    runHook preCheck
+
+    echo "Running hierarchical loading tests..."
+
+    # Run the test script with explicit paths
+    ${bash}/bin/bash $src/scripts/tests/test-hierarchical-loading.sh \
+      --activation-cmd ${activationScript}/bin/claude-skill-activation \
+      --fixtures-dir $src/scripts/tests/fixtures
+
+    runHook postCheck
+  '';
 
   installPhase = ''
     runHook preInstall
