@@ -40,7 +40,6 @@ in
     programs.claude-code.settings.hooks = {
       UserPromptSubmit = [
         {
-          matcher = { };
           hooks = [
             {
               type = "command";
