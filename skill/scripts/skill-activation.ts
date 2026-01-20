@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { readFileSync } from 'fs';
+import { readFileSync, existsSync } from 'fs';
 import { join } from 'path';
 
 interface HookInput {
@@ -41,20 +41,70 @@ function showHelp(toStderr: boolean = false) {
     output('Usage: skill-activation-prompt [OPTIONS] [skill-rules.json]');
     output('');
     output('Reads hook input from stdin and checks for skill activation.');
+    output('Loads and merges skill rules from multiple locations hierarchically.');
     output('');
     output('Options:');
     output('  -h, --help          Show this help message and exit');
-    output('  skill-rules.json    Path to skill rules file (required if CLAUDE_PROJECT_DIR is not set)');
+    output('  skill-rules.json    Optional explicit path to skill rules file (highest priority)');
     output('');
-    output('Environment Variables:');
-    output('  CLAUDE_PROJECT_DIR  If set, will look for .claude/skills/skill-rules.json in this directory');
+    output('Search Order (highest to lowest priority):');
+    output('  1. Explicit CLI argument path');
+    output('  2. $CLAUDE_PROJECT_DIR/.claude/skills/skill-rules.json');
+    output('  3. ./.claude/skills/skill-rules.json (current directory)');
+    output('  4. ~/.claude/skills/skill-rules.json (home directory)');
+    output('');
+    output('Skills from higher priority sources override those with the same name.');
+    output('Skills unique to each source are merged together.');
     output('');
     output('Examples:');
-    output('  # Using environment variable');
-    output('  CLAUDE_PROJECT_DIR=/path/to/project skill-activation-prompt < input.json');
+    output('  # Auto-discover from hierarchy');
+    output('  skill-activation-prompt < input.json');
     output('');
-    output('  # Using explicit path');
+    output('  # With explicit path (takes highest priority)');
     output('  skill-activation-prompt /path/to/skill-rules.json < input.json');
+}
+
+function discoverSkillRulesFiles(explicitPath?: string): string[] {
+    const paths: string[] = [];
+
+    // 1. Explicit path (highest priority)
+    if (explicitPath && existsSync(explicitPath)) {
+        paths.push(explicitPath);
+    }
+
+    // 2. CLAUDE_PROJECT_DIR
+    if (process.env.CLAUDE_PROJECT_DIR) {
+        const projectPath = join(process.env.CLAUDE_PROJECT_DIR, '.claude', 'skills', 'skill-rules.json');
+        if (existsSync(projectPath) && !paths.includes(projectPath)) {
+            paths.push(projectPath);
+        }
+    }
+
+    // 3. Current working directory
+    const cwdPath = join(process.cwd(), '.claude', 'skills', 'skill-rules.json');
+    if (existsSync(cwdPath) && !paths.includes(cwdPath)) {
+        paths.push(cwdPath);
+    }
+
+    // 4. Home directory (lowest priority)
+    const homePath = join(process.env.HOME || '', '.claude', 'skills', 'skill-rules.json');
+    if (existsSync(homePath) && !paths.includes(homePath)) {
+        paths.push(homePath);
+    }
+
+    return paths;
+}
+
+function mergeSkillRules(rulesArray: SkillRules[]): SkillRules {
+    const merged: SkillRules = { version: '1.0', skills: {} };
+
+    // Process in reverse (lowest priority first, higher priority overwrites)
+    for (const rules of [...rulesArray].reverse()) {
+        merged.version = rules.version || merged.version;
+        merged.skills = { ...merged.skills, ...rules.skills };
+    }
+
+    return merged;
 }
 
 async function main() {
@@ -73,23 +123,20 @@ async function main() {
         const data: HookInput = JSON.parse(input);
         const prompt = data.prompt.toLowerCase();
 
-        // Determine skill rules path
-        let rulesPath: string;
-        if (process.env.CLAUDE_PROJECT_DIR) {
-            // Use environment variable if set
-            const projectDir = process.env.CLAUDE_PROJECT_DIR;
-            rulesPath = join(projectDir, '.claude', 'skills', 'skill-rules.json');
-        } else {
-            // Require CLI argument
-            if (args.length === 0) {
-                showHelp(true);
-                process.exit(1);
-            }
-            rulesPath = args[0];
+        // Discover skill rules files hierarchically
+        const explicitPath = args.length > 0 ? args[0] : undefined;
+        const discoveredPaths = discoverSkillRulesFiles(explicitPath);
+
+        if (discoveredPaths.length === 0) {
+            // No rules found - exit silently
+            process.exit(0);
         }
 
-        // Load skill rules
-        const rules: SkillRules = JSON.parse(readFileSync(rulesPath, 'utf-8'));
+        // Load and merge all found files
+        const rulesArray: SkillRules[] = discoveredPaths.map(path =>
+            JSON.parse(readFileSync(path, 'utf-8'))
+        );
+        const rules = mergeSkillRules(rulesArray);
 
         const matchedSkills: MatchedSkill[] = [];
 
