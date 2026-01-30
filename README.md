@@ -48,6 +48,67 @@ See [skill/references/SKILL_RULES_REFERENCE.md](skill/references/SKILL_RULES_REF
 - Suggests relevant skills automatically
 - Tracks session state to avoid repeated suggestions
 
+## Testing Skill Activation
+
+The test script (`test-skill-activation.sh`) is **not included** in the Nix package. To test skill activation manually, you need to invoke the hook binary directly from the Nix store.
+
+### Finding Your Hook Binary Path
+
+Check your `~/.claude/settings.json` for the hook command:
+
+```bash
+jq '.hooks.UserPromptSubmit[0].hooks[0].command' ~/.claude/settings.json
+```
+
+This will show something like:
+```
+"/nix/store/xxx-claude-skill-activation-0.0.1/bin/claude-skill-activation ~/.claude/skill-rules.json"
+```
+
+### Manual Testing
+
+**Important:** The hook reads from stdin using file redirection (`<`), not piping (`|`).
+
+```bash
+# Create a test input file
+echo '{"session_id":"test","prompt":"your test prompt here"}' > /tmp/test-input.json
+
+# Run the hook with file redirection (NOT piping)
+/nix/store/xxx-claude-skill-activation-0.0.1/bin/claude-skill-activation ~/.claude/skill-rules.json < /tmp/test-input.json
+```
+
+**Why file redirection?** The hook uses Node.js `readFileSync(0, 'utf-8')` to read stdin synchronously, which works with file redirection but may fail with piped input in some shell contexts.
+
+### Example Test Session
+
+```bash
+# 1. Find your hook path
+HOOK_PATH=$(jq -r '.hooks.UserPromptSubmit[0].hooks[0].command' ~/.claude/settings.json | awk '{print $1}')
+RULES_PATH=$(jq -r '.hooks.UserPromptSubmit[0].hooks[0].command' ~/.claude/settings.json | awk '{print $2}')
+
+# 2. Expand tilde in rules path
+RULES_PATH="${RULES_PATH/#\~/$HOME}"
+
+# 3. Create test input
+echo '{"session_id":"test","prompt":"create beads tasks"}' > /tmp/test.json
+
+# 4. Run test
+$HOOK_PATH $RULES_PATH < /tmp/test.json
+```
+
+Expected output when a skill matches:
+```
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🎯 SKILL ACTIVATION CHECK
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📚 RECOMMENDED SKILLS:
+  → beads
+
+ACTION: Use Skill tool BEFORE responding
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+```
+
 ## Options Reference
 
 ### `programs.claude-code.plugins.skill-activation.enable`
